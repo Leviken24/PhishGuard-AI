@@ -56,7 +56,7 @@ export default function ScanInput({ mode, onScan, isScanning }) {
           className="mt-6 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg ring-1 ring-white/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed hover:scale-[1.01]"
         >
           {isScanning ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
-          {isScanning ? 'Analyzing directly via Claude AI...' : 'Scan Now'}
+          {isScanning ? 'Analyzing directly via Gemini AI...' : 'Scan Now'}
         </button>
       </form>
 

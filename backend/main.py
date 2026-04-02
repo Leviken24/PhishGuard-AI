@@ -4,7 +4,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import anthropic
+from google import genai
+from google.genai import types
 
 from feature_extractor import extract_url_features, extract_email_features
 
@@ -21,10 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Anthropic Client
-anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
-if anthropic_api_key:
-    client = anthropic.Anthropic(api_key=anthropic_api_key)
+# Initialize Gemini Client
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+if gemini_api_key:
+    client = genai.Client(api_key=gemini_api_key)
 else:
     client = None
 
@@ -54,7 +55,7 @@ EMAIL_SYSTEM_PROMPT = """You are a cybersecurity expert specializing in phishing
 }
 Be specific about linguistic and structural red flags. No text outside JSON."""
 
-def parse_claude_response(response_text: str) -> dict:
+def parse_ai_response(response_text: str) -> dict:
     try:
         # Sometimes LLMs wrap JSON in markdown blocks
         clean_text = response_text.strip()
@@ -69,39 +70,37 @@ def parse_claude_response(response_text: str) -> dict:
 @app.post("/analyze/url")
 async def analyze_url(req: URLRequest):
     if not client:
-        raise HTTPException(status_code=500, detail="Anthropic API key not configured. Add ANTHROPIC_API_KEY to .env file.")
+        raise HTTPException(status_code=500, detail="Gemini API key not configured. Add GEMINI_API_KEY to .env file.")
     
     features = extract_url_features(req.url)
     
     try:
-        response = client.messages.create(
-            model="claude-3-haiku-20240307",
-            max_tokens=1000,
-            system=URL_SYSTEM_PROMPT,
-            messages=[
-                {"role": "user", "content": f"URL to analyze: {req.url}\n\nExtracted Features: {json.dumps(features, indent=2)}"}
-            ]
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=f"URL to analyze: {req.url}\n\nExtracted Features: {json.dumps(features, indent=2)}",
+            config=types.GenerateContentConfig(
+                system_instruction=URL_SYSTEM_PROMPT,
+            )
         )
-        return parse_claude_response(response.content[0].text)
+        return parse_ai_response(response.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/analyze/email")
 async def analyze_email(req: EmailRequest):
     if not client:
-        raise HTTPException(status_code=500, detail="Anthropic API key not configured. Add ANTHROPIC_API_KEY to .env file.")
+        raise HTTPException(status_code=500, detail="Gemini API key not configured. Add GEMINI_API_KEY to .env file.")
     
     features = extract_email_features(req.email_text)
     
     try:
-        response = client.messages.create(
-            model="claude-3-haiku-20240307",
-            max_tokens=1000,
-            system=EMAIL_SYSTEM_PROMPT,
-            messages=[
-                {"role": "user", "content": f"Email text to analyze: {req.email_text}\n\nExtracted Features: {json.dumps(features, indent=2)}"}
-            ]
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=f"Email text to analyze: {req.email_text}\n\nExtracted Features: {json.dumps(features, indent=2)}",
+            config=types.GenerateContentConfig(
+                system_instruction=EMAIL_SYSTEM_PROMPT,
+            )
         )
-        return parse_claude_response(response.content[0].text)
+        return parse_ai_response(response.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

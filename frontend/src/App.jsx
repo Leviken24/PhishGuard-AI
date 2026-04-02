@@ -64,7 +64,7 @@ function App() {
 
     } catch (err) {
       console.error(err);
-      alert("Failed to analyze. Ensure backend is running and Anthropic API key is set.");
+      alert("Failed to analyze. Ensure backend is running and Gemini API key is set.");
     } finally {
       setIsScanning(false);
     }
