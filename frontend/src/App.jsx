@@ -33,8 +33,8 @@ function App() {
 
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
-  const API_URL = 'http://127.0.0.1:8000'; // Make sure uvicorn runs on default port
-
+  // Use environment variable for production URL, fallback to localhost for local dev
+  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
   const handleScan = async (inputVal) => {
     setIsScanning(true);
     setCurrentResult(null);
