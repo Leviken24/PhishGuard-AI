@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --border: 214.3 31.8% 91.4%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
+
+.glass-panel {
+  @apply bg-white/70 dark:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-xl rounded-2xl;
+}
+
+@keyframes fadeInScale {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Confidence meter conic gradient util */
+.conic-gradient-safe {
+  background: conic-gradient(#22c55e var(--score-deg), #e2e8f0 0deg);
+}
+
+.dark .conic-gradient-safe {
+  background: conic-gradient(#22c55e var(--score-deg), #334155 0deg);
+}
+
+.conic-gradient-suspicious {
+  background: conic-gradient(#f59e0b var(--score-deg), #e2e8f0 0deg);
+}
+
+.dark .conic-gradient-suspicious {
+  background: conic-gradient(#f59e0b var(--score-deg), #334155 0deg);
+}
+
+.conic-gradient-phishing {
+  background: conic-gradient(#ef4444 var(--score-deg), #e2e8f0 0deg);
+}
+
+.dark .conic-gradient-phishing {
+  background: conic-gradient(#ef4444 var(--score-deg), #334155 0deg);
+}
